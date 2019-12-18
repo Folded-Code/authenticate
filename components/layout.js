@@ -18,6 +18,9 @@ export default function Layout(props) {
         <Link href="/">
           <a style={linkStyle}>Home</a>
         </Link>
+        <Link href="/login">
+          <a style={linkStyle}>Login</a>
+        </Link>
       </div>
       {props.children}
       <style jsx>{`
