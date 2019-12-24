@@ -9,18 +9,19 @@ import Link from 'next/link'
 
 import Layout from '../components/layout.js'
 
-function App() {
-  const cookies = new Cookies()
-  console.log(cookies.get('account'))
+function Account() {
+  const uname = async () => {
+    fetch('/getUname', {
+      method: 'POST',
+      body: JSON.stringify({ k: 'poo' }),
+    }).then(r => return r.text())
+  }
 
+  console.log(uname)
   return (
     <div>
       <Layout>
-        <h1>Home</h1>
-
-        <Link href="/login">
-          <a>Login / Signup</a>
-        </Link>
+        <h1>Account Information</h1>
 
         <style jsx>{`
           * {
@@ -49,4 +50,4 @@ function App() {
     </div>
   )
 }
-export default App
+export default Account

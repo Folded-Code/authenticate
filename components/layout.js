@@ -21,6 +21,9 @@ export default function Layout(props) {
         <Link href="/login">
           <a style={linkStyle}>Login</a>
         </Link>
+        <Link href="/account">
+          <a style={linkStyle}>Account</a>
+        </Link>
       </div>
       {props.children}
       <style jsx>{`

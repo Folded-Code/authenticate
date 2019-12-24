@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import fetch from 'isomorphic-unfetch'
+import Cookies from 'universal-cookie'
 
 import Link from 'next/link'
+import Router from 'next/router'
 
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
@@ -9,8 +11,11 @@ import Button from '@material-ui/core/Button'
 import Layout from '../components/layout.js'
 
 function Signup() {
+  const cookies = new Cookies()
+
   const [uname, setUname] = useState('')
   const [pas, setPas] = useState('')
+  const [createErr, setCreateErr] = useState('')
 
   function sendData() {
     fetch('/signup', {
@@ -18,7 +23,30 @@ function Signup() {
       body: JSON.stringify({ Uname: uname, Pas: pas }),
     })
       .then(r => r.json())
-      .then(data => {})
+      .then(data => {
+        if (!data.validLogin) {
+          let mess = 'Try Again ('
+          if (!data.reasons.unam) {
+            mess += 'Invalid Username'
+          }
+          if (!data.reasons.pas) {
+            mess[mess.length - 1] !== '(' ? (mess += ', ') : null
+            mess += 'Invalid Password'
+          }
+          if (!data.reasons.notDuplicate) {
+            mess[mess.length - 1] !== '(' ? (mess += ', ') : null
+            mess += 'Duplicate Username'
+          }
+          mess += ')'
+          setCreateErr(mess)
+        } else {
+          cookies.set('account', data.id, { path: '/' })
+          console.log(cookies.get('account'))
+          console.log(data.id)
+          setCreateErr('')
+          Router.push('/')
+        }
+      })
   }
 
   return (
@@ -57,8 +85,15 @@ function Signup() {
           Signup
         </Button>
 
-        <br />
-        <br />
+        <p>
+          {createErr.length !== 0 ? (
+            <>
+              <br />
+            </>
+          ) : null}
+          {createErr}
+        </p>
+
         <br />
 
         <Link href="/login">
@@ -66,9 +101,7 @@ function Signup() {
         </Link>
 
         <style jsx>{`
-          h1,
-          h2,
-          a {
+          * {
             font-family: 'Arial';
           }
 

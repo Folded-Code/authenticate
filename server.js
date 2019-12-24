@@ -1,19 +1,21 @@
-const express = require('express')
-const next = require('next')
-const bodyParser = require('body-parser')
-const PORT = process.env.PORT || 3000
-const dev = process.env.NODE_DEV !== 'production' //true false
-const nextApp = next({ dev })
-const handle = nextApp.getRequestHandler() //part of next config
-const mongoose = require('mongoose')
+const fs = require('fs'),
+  express = require('express'),
+  next = require('next'),
+  bodyParser = require('body-parser'),
+  PORT = process.env.PORT || 3000,
+  dev = true, //true / false
+  nextApp = next({ dev }),
+  handle = nextApp.getRequestHandler(), //part of next config
+  info = JSON.parse(fs.readFileSync('./data.json'))
+// const mongoose = require('mongoose')
 
-mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true })
-
-const userSchem = new mongoose.Schema({
-  Uname: String,
-  Pas: String,
-})
-const User = mongoose.model('User', userSchem)
+// mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true })
+//
+// const userSchem = new mongoose.Schema({
+//   Uname: String,
+//   Pas: String,
+// })
+// const User = mongoose.model('User', userSchem)
 
 nextApp.prepare().then(() => {
   // express code here
@@ -30,30 +32,81 @@ nextApp.prepare().then(() => {
   )
 
   app.post('/login', (req, res) => {
-    let goodUname = /^(?=.*[a-z]).{5,}$/g
-    let goodPas = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{5,}$/g
     let data = JSON.parse(req.body)
-    if (goodUname.test(data.uname) && goodPas.test(data.pas)) {
-      // let users =
+    let user = info.users.find(
+      v => v.Uname === data.Uname && v.Pas === data.Pas
+    )
+
+    if (user !== undefined) {
+      res.send({
+        validLogin: true,
+        id: user.id,
+      })
     } else {
-      res.send({ validLogin: false })
+      res.send({
+        validLogin: false,
+      })
     }
   })
 
   app.post('/signup', (req, res) => {
-    let goodUname = /^(?=.*[a-z]).{5,20}$/g
+    const saveUser = user => {
+      info.users.push(user)
+      console.log(info)
+      fs.writeFile('./data.json', JSON.stringify(info, null, 2), err => {
+        if (err) {
+          console.error(err)
+        }
+      })
+    }
+
+    let goodUname = /^(?=.*[a-z]).{2,20}$/g
     let goodPas = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{5,20}$/g
     let data = JSON.parse(req.body)
 
-    if (goodUname.test(data.Uname) && goodPas.test(data.Pas)) {
-      const user = new User({ Uname: data.Uname, Pas: data.Pas })
-      console.log(user)
-      user.save().then(() => console.log(`New User: ${user.Uname}`))
+    let isGoodName = goodUname.test(data.Uname)
+    let isGoodPas = goodPas.test(data.Pas)
+    let isDuplicate = info.users.some(v => v.Uname == data.Uname)
 
-      res.send({ validLogin: true })
+    if (isGoodName && isGoodPas && !isDuplicate) {
+      const randomString = string_length => {
+        let chars =
+          '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'
+        let randomstring = ''
+        for (let i = 0; i < string_length; i++) {
+          let rnum = Math.floor(Math.random() * chars.length)
+          randomstring += chars.substring(rnum, rnum + 1)
+        }
+        return randomstring
+      }
+
+      const user = { Uname: data.Uname, Pas: data.Pas, id: randomString(32) }
+
+      saveUser(user)
+
+      res.send({
+        validLogin: true,
+        reasons: {
+          unam: isGoodName,
+          pas: isGoodPas,
+          notDuplicate: !isDuplicate,
+        },
+        id: user.id,
+      })
     } else {
-      res.send({ validLogin: false })
+      res.send({
+        validLogin: false,
+        reasons: {
+          unam: isGoodName,
+          pas: isGoodPas,
+          notDuplicate: !isDuplicate,
+        },
+      })
     }
+  })
+
+  app.post('/getUname', (req, res) => {
+    res.send(req.body)
   })
 
   app.get('*', (req, res) => {
@@ -62,6 +115,7 @@ nextApp.prepare().then(() => {
 
   app.listen(PORT, err => {
     if (err) throw err
+    console.clear()
     console.log(`Ready at http://localhost:${PORT}`)
   })
 })
