@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import fetch from 'isomorphic-unfetch'
 import Cookies from 'universal-cookie'
+import shajs from 'sha.js'
 
 import Link from 'next/link'
 import Router from 'next/router'
@@ -20,7 +21,12 @@ function Login() {
   function sendData() {
     fetch('/login', {
       method: 'POST',
-      body: JSON.stringify({ Uname: uname, Pas: pas }),
+      body: JSON.stringify({
+        uname: uname,
+        pas: shajs('sha256')
+          .update(pas)
+          .digest('hex'),
+      }),
     })
       .then(r => r.json())
       .then(data => {
@@ -28,8 +34,7 @@ function Login() {
           // setCreateErr('Login Successful')
           // setTimeout(() => setCreateErr(''), 3000)
           cookies.set('account', data.id, { path: '/' })
-          console.log(cookies.get('account'))
-          console.log(data.id)
+          cookies.set('name', data.name, { path: '/' })
           Router.push('/')
         } else {
           setCreateErr('Login Failed')
@@ -57,8 +62,8 @@ function Login() {
           variant="filled"
           autoComplete="current-password"
           value={pas}
-          type="Password"
-          label="Password"
+          type="password"
+          label="password"
           onChange={e => setPas(e.target.value)}
         />
 

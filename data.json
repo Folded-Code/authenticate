@@ -1,14 +1,9 @@
 {
   "users": [
     {
-      "Uname": "aaaaaaaaa",
-      "Pas": "Asss1ddd",
-      "id": "OFz6dvp43hwn7lHHN5aIoCvG17aKAatp"
-    },
-    {
-      "Uname": "aaaaaaaaaad",
-      "Pas": "a!sssdffff1A",
-      "id": "XDsv5zwqoi7lWl5t5KzCtBiZ3lTdVboo"
+      "uname": "aa",
+      "pas": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+      "id": "6XfDPPgv6OLgoJ7XF8BVRTQXPbbXHA0g"
     }
   ]
 }

@@ -11,7 +11,7 @@ import Layout from '../components/layout.js'
 
 function Account() {
   const uname = async () => {
-    fetch('/getUname', {
+    fetch('/getuname', {
       method: 'POST',
       body: JSON.stringify({ k: 'poo' }),
     }).then(r => return r.text())

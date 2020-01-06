@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import fetch from 'isomorphic-unfetch'
 import Cookies from 'universal-cookie'
+import shajs from 'sha.js'
 
 import Link from 'next/link'
 import Router from 'next/router'
@@ -20,7 +21,12 @@ function Signup() {
   function sendData() {
     fetch('/signup', {
       method: 'POST',
-      body: JSON.stringify({ Uname: uname, Pas: pas }),
+      body: JSON.stringify({
+        uname: uname,
+        pas: shajs('sha256')
+          .update(pas)
+          .digest('hex'),
+      }),
     })
       .then(r => r.json())
       .then(data => {
@@ -31,7 +37,7 @@ function Signup() {
           }
           if (!data.reasons.pas) {
             mess[mess.length - 1] !== '(' ? (mess += ', ') : null
-            mess += 'Invalid Password'
+            mess += 'Invalid password'
           }
           if (!data.reasons.notDuplicate) {
             mess[mess.length - 1] !== '(' ? (mess += ', ') : null
@@ -41,8 +47,7 @@ function Signup() {
           setCreateErr(mess)
         } else {
           cookies.set('account', data.id, { path: '/' })
-          console.log(cookies.get('account'))
-          console.log(data.id)
+          cookies.set('name', data.name, { path: '/' })
           setCreateErr('')
           Router.push('/')
         }
@@ -68,8 +73,8 @@ function Signup() {
           variant="filled"
           autoComplete="current-password"
           value={pas}
-          type="Password"
-          label="Password"
+          type="password"
+          label="password"
           onChange={e => setPas(e.target.value)}
         />
 

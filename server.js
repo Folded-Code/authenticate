@@ -2,6 +2,7 @@ const fs = require('fs'),
   express = require('express'),
   next = require('next'),
   bodyParser = require('body-parser'),
+  shajs = require('sha.js'),
   PORT = process.env.PORT || 3000,
   dev = true, //true / false
   nextApp = next({ dev }),
@@ -12,8 +13,8 @@ const fs = require('fs'),
 // mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true })
 //
 // const userSchem = new mongoose.Schema({
-//   Uname: String,
-//   Pas: String,
+//   uname: String,
+//   pas: String,
 // })
 // const User = mongoose.model('User', userSchem)
 
@@ -34,13 +35,14 @@ nextApp.prepare().then(() => {
   app.post('/login', (req, res) => {
     let data = JSON.parse(req.body)
     let user = info.users.find(
-      v => v.Uname === data.Uname && v.Pas === data.Pas
+      v => v.uname === data.uname && v.pas === data.pas
     )
 
     if (user !== undefined) {
       res.send({
         validLogin: true,
         id: user.id,
+        name: user.uname,
       })
     } else {
       res.send({
@@ -52,7 +54,6 @@ nextApp.prepare().then(() => {
   app.post('/signup', (req, res) => {
     const saveUser = user => {
       info.users.push(user)
-      console.log(info)
       fs.writeFile('./data.json', JSON.stringify(info, null, 2), err => {
         if (err) {
           console.error(err)
@@ -60,15 +61,16 @@ nextApp.prepare().then(() => {
       })
     }
 
-    let goodUname = /^(?=.*[a-z]).{2,20}$/g
-    let goodPas = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{5,20}$/g
     let data = JSON.parse(req.body)
 
-    let isGoodName = goodUname.test(data.Uname)
-    let isGoodPas = goodPas.test(data.Pas)
-    let isDuplicate = info.users.some(v => v.Uname == data.Uname)
+    let gooduname = /^(?=.*[a-z]).{2,20}$/g
+    // let goodpas = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{5,20}$/g
 
-    if (isGoodName && isGoodPas && !isDuplicate) {
+    let isGoodName = gooduname.test(data.uname)
+    // let isGoodpas = goodpas.test(data.pas)
+    let isDuplicate = info.users.some(v => v.uname == data.uname)
+
+    if (isGoodName /*&& isGoodpas */ && !isDuplicate) {
       const randomString = string_length => {
         let chars =
           '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'
@@ -80,7 +82,7 @@ nextApp.prepare().then(() => {
         return randomstring
       }
 
-      const user = { Uname: data.Uname, Pas: data.Pas, id: randomString(32) }
+      const user = { uname: data.uname, pas: data.pas, id: randomString(32) }
 
       saveUser(user)
 
@@ -88,25 +90,34 @@ nextApp.prepare().then(() => {
         validLogin: true,
         reasons: {
           unam: isGoodName,
-          pas: isGoodPas,
           notDuplicate: !isDuplicate,
         },
         id: user.id,
+        name: user.uname,
       })
     } else {
       res.send({
         validLogin: false,
         reasons: {
           unam: isGoodName,
-          pas: isGoodPas,
           notDuplicate: !isDuplicate,
         },
       })
     }
   })
 
+  app.post('/signout', (req, res) => {
+    let data = JSON.parse(req.body)
+  })
+
   app.post('/getUname', (req, res) => {
-    res.send(req.body)
+    let data = JSON.parse(req.body)
+
+    let user = info.users.find(v => v.id === data.id)
+
+    res.send(
+      JSON.stringify({ uname: user !== undefined ? user.uname : 'Guest' })
+    )
   })
 
   app.get('*', (req, res) => {
