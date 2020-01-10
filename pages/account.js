@@ -3,6 +3,7 @@ import fetch from 'isomorphic-unfetch'
 import Cookies from 'universal-cookie'
 
 import Link from 'next/link'
+import Router from 'next/router'
 
 // import TextField from '@material-ui/core/TextField'
 // import Button from '@material-ui/core/Button'
@@ -10,19 +11,21 @@ import Link from 'next/link'
 import Layout from '../components/layout.js'
 
 function Account() {
-  const uname = async () => {
-    fetch('/getuname', {
-      method: 'POST',
-      body: JSON.stringify({ k: 'poo' }),
-    }).then(r => return r.text())
-  }
+  const cookies = new Cookies()
 
-  console.log(uname)
+  const accId = cookies.get('account')
+  const uname = cookies.get('name')
+
+  if (uname === undefined) {
+    // Router.push('/')
+  }
   return (
     <div>
       <Layout>
         <h1>Account Information</h1>
-
+        <p>
+          Username: <b>{uname}</b>
+        </p>
         <style jsx>{`
           * {
             font-family: 'Arial';

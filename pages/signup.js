@@ -30,12 +30,13 @@ function Signup() {
     })
       .then(r => r.json())
       .then(data => {
-        if (!data.validLogin) {
+        let goodpas = /^(?=.*[a-z])(?=.*\d).{5,20}$/g
+        if (!data.validLogin || !goodpas.test(pas)) {
           let mess = 'Try Again ('
           if (!data.reasons.unam) {
             mess += 'Invalid Username'
           }
-          if (!data.reasons.pas) {
+          if (!goodpas.test(pas)) {
             mess[mess.length - 1] !== '(' ? (mess += ', ') : null
             mess += 'Invalid password'
           }
