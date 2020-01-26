@@ -5,8 +5,8 @@ import Cookies from 'universal-cookie'
 import Link from 'next/link'
 import Router from 'next/router'
 
-// import TextField from '@material-ui/core/TextField'
-// import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import Button from '@material-ui/core/Button'
 
 import Layout from '../components/layout.js'
 
@@ -16,8 +16,9 @@ function Account() {
   const accId = cookies.get('account')
   const uname = cookies.get('name')
 
+  // console.log(Router)
   if (uname === undefined) {
-    // Router.push('/')
+    Router.push('/')
   }
   return (
     <div>
@@ -26,6 +27,7 @@ function Account() {
         <p>
           Username: <b>{uname}</b>
         </p>
+
         <style jsx>{`
           * {
             font-family: 'Arial';

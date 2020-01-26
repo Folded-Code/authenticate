@@ -5,6 +5,9 @@ import Cookies from 'universal-cookie'
 import Link from 'next/link'
 
 import Layout from '../components/layout.js'
+import Post from '../components/post.js'
+
+import '../styles.css'
 
 function App() {
   const cookies = new Cookies()
@@ -31,29 +34,10 @@ function App() {
           )}
         </p>
 
-        <style jsx>{`
-          * {
-            font-family: 'Arial';
-          }
-
-          ul {
-            padding: 0;
-          }
-
-          li {
-            list-style: none;
-            margin: 5px 0;
-          }
-
-          a {
-            text-decoration: none;
-            color: blue;
-          }
-
-          a:hover {
-            opacity: 0.6;
-          }
-        `}</style>
+        <div>
+          <h3>Posts:</h3>
+          <Post />
+        </div>
       </Layout>
     </div>
   )

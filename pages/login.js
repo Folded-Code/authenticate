@@ -11,6 +11,8 @@ import Button from '@material-ui/core/Button'
 
 import Layout from '../components/layout.js'
 
+import '../public/styles.css'
+
 function Login() {
   const cookies = new Cookies()
 
@@ -93,21 +95,6 @@ function Login() {
         <Link href="/signup">
           <a>Signup</a>
         </Link>
-
-        <style jsx>{`
-          * {
-            font-family: 'Arial';
-          }
-
-          a {
-            text-decoration: none;
-            color: blue;
-          }
-
-          a:hover {
-            opacity: 0.6;
-          }
-        `}</style>
       </Layout>
     </div>
   )
