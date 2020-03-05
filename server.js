@@ -33,18 +33,21 @@ nextApp.prepare().then(() => {
   )
 
   app.post('/login', (req, res) => {
-    let data = JSON.parse(req.body)
+    // console.log(req.body)
+    let data = req.body
     let user = info.users.find(
       v => v.uname === data.uname && v.pas === data.pas
     )
 
     if (user !== undefined) {
+      console.log(`Successful Login: ${user.uname}`)
       res.send({
         validLogin: true,
         id: user.id,
         name: user.uname,
       })
     } else {
+      console.log('Failed login')
       res.send({
         validLogin: false,
       })
